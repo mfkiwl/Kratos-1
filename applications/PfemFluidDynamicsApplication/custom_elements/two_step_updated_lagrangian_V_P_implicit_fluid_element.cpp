@@ -588,7 +588,7 @@ namespace Kratos
     VolumetricCoeff = bulk_modulus * time_step;
     Density = mpConstitutiveLaw->CalculateValue(constitutive_law_values, DENSITY, Density);
 
-    // ////////////// imposing max Density to interface elements ///////////
+    // // ////////////// imposing max Density to interface elements for multi-fluid analysis///////////
     // const auto &r_geometry = this->GetGeometry();
     // const unsigned int number_of_nodes = r_geometry.size();  
     // double maxDensity = Density;
@@ -601,7 +601,7 @@ namespace Kratos
     //   }
     // }
     // Density = maxDensity;
-    // ////////////////////////////////////////////////////////////////////
+    // // ////////////////////////////////////////////////////////////////////
 
     this->mMaterialDeviatoricCoefficient = DeviatoricCoeff;
     this->mMaterialVolumetricCoefficient = VolumetricCoeff;

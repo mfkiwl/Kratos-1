@@ -99,15 +99,19 @@ namespace Kratos
         // We loop over the nodes...
         const auto it_node_begin = mrModelPart.NodesBegin();
         const int num_threads = ParallelUtilities::GetNumThreads();
-        std::vector<double> max_vector(num_threads, -1.0);
+        // std::vector<double> max_vector(num_threads, -1.0);
+
+        double counter = 0;
+        double heightSum = 0;
 
         #pragma omp parallel for
-        for (int i = 0; i < static_cast<int>(mrModelPart.Nodes().size()); i++) {
+        for (int i = 0; i < static_cast<int>(mrModelPart.Nodes().size()); i++)
+        {
           auto it_node = it_node_begin + i;
 
           const int thread_id = OpenMPUtils::ThisThread();
           const auto &r_node_coordinates = it_node->Coordinates();
-          if (it_node->IsNot(ISOLATED) &&
+          if (it_node->IsNot(ISOLATED) && it_node->IsNot(RIGID) &&
               it_node->Is(FREE_SURFACE) &&
               r_node_coordinates(mPlaneDirection) < (mPlaneCoordinates + mTolerance) &&
               r_node_coordinates(mPlaneDirection) > (mPlaneCoordinates - mTolerance))
@@ -120,16 +124,20 @@ namespace Kratos
             //     r_node_coordinates(2) < maxTransversalCoordinate)
             // {
             const double height = r_node_coordinates(mHeightDirection);
+            // const double wave_height = std::abs(height - mHeightReference);
+            const double wave_height = height - mHeightReference;
+            counter += 1.0;
+            heightSum += wave_height;
 
-            const double wave_height = std::abs(height - mHeightReference);
-            if (wave_height > max_vector[thread_id])
-              max_vector[thread_id] = wave_height;
+            // if (wave_height > max_vector[thread_id])
+            //   max_vector[thread_id] = wave_height;
           }
         }
-        const double max_height = *std::max_element(max_vector.begin(), max_vector.end());
-
+        // const double max_height = *std::max_element(max_vector.begin(), max_vector.end());
+        const double max_height = heightSum / counter;
         // We open the file where we print the wave height values
-        if (max_height > -1.0) {
+        if (max_height > -1.0)
+        {
           std::ofstream my_file;
           const std::string file_name = mOutputFileName + ".txt";
           my_file.open(file_name, std::ios_base::app);
