@@ -1600,12 +1600,12 @@ public:
         const SizeType Bsize2 = rB.size2();
 
 #ifdef KRATOS_USE_AMATRIX   // This macro definition is for the migration period and to be removed afterward please do not use it
-        KRATOS_WARNING_IF("BtDBProductOperation", rA.size1() != size1 || rA.size2() != size2) << "BtDBProductOperation has detected an incorrect size of your resulting matrix matrix. Please resize before compute" << std::endl;
+        KRATOS_WARNING_IF("BtDBProductOperation", rA.size1() != Bsize2 || rA.size2() != Bsize2) << "BtDBProductOperation has detected an incorrect size of your resulting matrix matrix. Please resize before compute" << std::endl;
 #else
-        if (ClearInput) {
-            if (rA.size1() != size1 || rA.size2() != Bsize2)
+        // if (ClearInput) {
+            if (rA.size1() != Bsize2 || rA.size2() != Bsize2)
                 rA.resize(Bsize2, Bsize2, false);
-        }
+        // }
 
 #endif // KRATOS_USE_AMATRIX
 
@@ -1613,7 +1613,7 @@ public:
         // noalias(rA) = prod( trans( rB ), MatrixType(prod(rD, rB)));
 
         // Manual multiplication
-        if (ClearInput)
+        // if (ClearInput)
             rA.clear();
         
         double Dkl, DklBlj;

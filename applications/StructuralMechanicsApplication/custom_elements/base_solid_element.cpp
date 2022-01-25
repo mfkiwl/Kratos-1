@@ -1730,15 +1730,48 @@ array_1d<double, 3> BaseSolidElement::GetBodyForce(
 
 void BaseSolidElement::CalculateAndAddKm(
     MatrixType& rLeftHandSideMatrix,
-    const Matrix& B,
-    const Matrix& D,
+    const Matrix& rB,
+    const Matrix& rD,
     const double IntegrationWeight
     ) const
 {
     KRATOS_TRY
 
     // noalias( rLeftHandSideMatrix ) += IntegrationWeight * prod( trans( B ), Matrix(prod(D, B)));
-    MathUtils<double>::BtDBProductOperation(rLeftHandSideMatrix, IntegrationWeight*D, B, false);
+    // MathUtils<double>::BtDBProductOperation(rLeftHandSideMatrix, IntegrationWeight*D, B, false);
+
+
+    const IndexType Bsize2 = rB.size2();
+
+    if (rLeftHandSideMatrix.size1() != Bsize2 || rLeftHandSideMatrix.size2() != Bsize2)
+        rLeftHandSideMatrix.resize(Bsize2, Bsize2, false);
+
+    rLeftHandSideMatrix.clear();
+
+    // KRATOS_WATCH(rLeftHandSideMatrix)
+    // KRATOS_WATCH(rB)
+    // KRATOS_WATCH(rD)
+
+    double Dkl, DklBlj;
+    IndexType k,l,j,i;
+    const IndexType D_size = rD.size1(); 
+    for (k = 0; k < D_size; ++k)
+        for (l = 0; l < D_size; ++l) {
+            Dkl = rD(k, l);
+            for (j = 0; j < Bsize2; ++j) {
+                DklBlj = Dkl * rB(l, j);
+                for (i = 0; i < Bsize2; ++i)
+                    rLeftHandSideMatrix(i, j) += rB(k, i) * DklBlj;
+            }
+        }
+
+
+
+
+
+
+
+
 
     KRATOS_CATCH( "" )
 }
