@@ -136,13 +136,14 @@ class SetOfModelParts():
 
 class GranulometryUtils():
 
-    def __init__(self, domain_volume, model_part):
+    def __init__(self, domain_volume, model_part, do_print_results_option=False):
 
         if domain_volume <= 0.0:
             raise ValueError(
                 "Error: The input domain volume must be strictly positive!")
 
         self.spheres_model_part = model_part
+        self.do_print_results_option = do_print_results_option
         self.UpdateData(domain_volume)
 
     def UpdateData(self, domain_volume):
@@ -159,8 +160,8 @@ class GranulometryUtils():
 
         self.voids_volume = domain_volume - self.solid_volume
         self.global_porosity = self.voids_volume / domain_volume
-
-        self.PrintCurrentData()
+        if self.do_print_results_option:
+            self.PrintCurrentData()
 
     def PrintCurrentData(self):
 
@@ -368,7 +369,6 @@ class Procedures():
 
         # MODEL
         self.domain_size = self.DEM_parameters["Dimension"].GetInt()
-        self.aux = AuxiliaryUtilities()
 
     def Barrier(self):
         pass
@@ -383,8 +383,7 @@ class Procedures():
         elif self.DEM_parameters["TranslationalIntegrationScheme"].GetString() == 'Velocity_Verlet':
             translational_scheme = VelocityVerletScheme()
         else:
-            KratosPrintWarning('Error: selected translational integration scheme not defined. Please select a different scheme')
-            sys.exit("\nExecution was aborted.\n")
+            raise Exception('Error: selected translational integration scheme not defined. Please select a different scheme')
         return translational_scheme
 
     def SetRotationalScheme(self):
@@ -402,8 +401,7 @@ class Procedures():
         elif self.DEM_parameters["RotationalIntegrationScheme"].GetString() == 'Quaternion_Integration':
             rotational_scheme = QuaternionIntegrationScheme()
         else:
-            KratosPrintWarning('Error: selected rotational integration scheme not defined. Please select a different scheme')
-            sys.exit("\nExecution was aborted.\n")
+            raise Exception('Error: selected rotational integration scheme not defined. Please select a different scheme')
         return rotational_scheme
 
     def AddAllVariablesInAllModelParts(self, solver, translational_scheme, rotational_scheme, all_model_parts, DEM_parameters):
@@ -414,8 +412,8 @@ class Procedures():
         rigid_face_model_part = all_model_parts.Get('RigidFacePart')
 
         self.solver = weakref.proxy(solver)
-        self.translational_scheme = weakref.proxy(translational_scheme)
-        self.rotational_scheme = weakref.proxy(rotational_scheme)
+        #self.translational_scheme = weakref.proxy(translational_scheme)
+        #self.rotational_scheme = weakref.proxy(rotational_scheme)
         self.AddCommonVariables(spheres_model_part, DEM_parameters)
         self.AddSpheresVariables(spheres_model_part, DEM_parameters)
         self.AddMpiVariables(spheres_model_part)
@@ -509,6 +507,8 @@ class Procedures():
         if "PostStressStrainOption" in self.DEM_parameters.keys():
             if self.DEM_parameters["PostStressStrainOption"].GetBool():
                 model_part.AddNodalSolutionStepVariable(DEM_STRESS_TENSOR)
+                model_part.AddNodalSolutionStepVariable(DEM_STRAIN_TENSOR)
+                model_part.AddNodalSolutionStepVariable(DEM_DIFFERENTIAL_STRAIN_TENSOR)
 
         if self.solver.poisson_ratio_option:
             model_part.AddNodalSolutionStepVariable(POISSON_VALUE)
@@ -842,15 +842,10 @@ class Procedures():
             return
         if actual_type is not expected_type:
             KratosPrintWarning(
-                "**************************************************************************")
-            KratosPrintWarning(
                 "ERROR: Input parameter of wrong type in file 'DEM_explicit_solver_var.py'.")
             a = str(expected_type)
             b = str(var)
-            KratosPrintWarning("The type expected was " + a + " but " + b + " was read.")
-            KratosPrintWarning(
-                "**************************************************************************")
-            sys.exit()
+            raise Exception("The type expected was " + a + " but " + b + " was read.")
 
     @classmethod
     def Flush(self, a):
@@ -891,8 +886,6 @@ class DEMFEMProcedures():
         self.graphs_path = graphs_path
         self.spheres_model_part = spheres_model_part
         self.rigid_face_model_part = rigid_face_model_part
-        #self.solver = solver
-        self.aux = AuxiliaryUtilities()
 
         self.fem_mesh_nodes = []
 
@@ -904,7 +897,6 @@ class DEMFEMProcedures():
             # that means it is not possible to print results with a higher frequency than the computations delta time
             self.graph_frequency = 1
 
-        self.mesh_motion = DEMFEMUtilities()
 
         def Flush(self, a):
             a.flush()
@@ -1260,6 +1252,10 @@ class MaterialTest():
         if self.TestType != "None":
             self.script.GenerateGraphics()
 
+    def PrintCoordinationNumberGraph(self, time, solver):
+        if self.TestType != "None":
+            self.script.PrintCoordinationNumberGraph(time, solver)
+
 
 class MultifileList():
 
@@ -1524,6 +1520,8 @@ class DEMIo():
             if self.DEM_parameters["PostStressStrainOption"].GetBool():
                 self.PushPrintVar(1, REPRESENTATIVE_VOLUME, self.spheres_variables)
                 self.PushPrintVar(1, DEM_STRESS_TENSOR, self.spheres_variables)
+                self.PushPrintVar(1, DEM_STRAIN_TENSOR, self.spheres_variables)
+                self.PushPrintVar(1, DEM_DIFFERENTIAL_STRAIN_TENSOR, self.spheres_variables)
 
         if "PostReactions" in self.DEM_parameters.keys():
             if self.DEM_parameters["PostReactions"].GetBool():

@@ -12,10 +12,8 @@
 #include <iostream>
 
 // Project includes
-#include "includes/define.h"
-#include "../DEM_application_variables.h"
-#include "includes/model_part.h"
 #include "random_variable.h"
+#include <random>
 
 namespace Kratos {
 
@@ -72,9 +70,7 @@ private:
     /// Assignment operator.
     PiecewiseLinearRandomVariable & operator=(PiecewiseLinearRandomVariable const& rOther);
 
-    double mRelativeClosenessTolerance;
-    double mMean;
-    bool mMeanHasAlreadyBeenCalculated=false;
+    double mRelativeClosenessTolerance = 0.0;
     std::vector<double> mPDFValues;
     std::vector<double> mPDFBreakpoints;
     std::mt19937 mRandomNumberGenerator;
