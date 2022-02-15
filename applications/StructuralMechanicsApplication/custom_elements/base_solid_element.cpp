@@ -1554,15 +1554,15 @@ void BaseSolidElement::RotateToLocalAxes(
                 ConstitutiveLawUtilities<3>::CalculateRotationOperatorVoigt(rotation_matrix, voigt_rotation_matrix);
                 rValues.GetStrainVector() = prod(voigt_rotation_matrix, rValues.GetStrainVector());
             }
-        } else { // rotate F
-            BoundedMatrix<double, 3, 3> inv_rotation_matrix;
+        } else { // rotate F to local axis
+            ConstitutiveLaw::DeformationGradientMatrixType inv_rotation_matrix;
+            ConstitutiveLaw::DeformationGradientMatrixType aux, F;
+            aux.resize(3, 3, false); F.resize(3, 3, false);
             double aux_det;
+            noalias(F) = rValues.GetDeformationGradientF();
             MathUtils<double>::InvertMatrix3(rotation_matrix, inv_rotation_matrix, aux_det);
-            const auto& r_F = rValues.GetDeformationGradientF();
-            BoundedMatrix<double, 3, 3> F_loc = r_F;
-            noalias(F_loc) = prod(rotation_matrix, r_F);
-            F_loc = prod(F_loc, inv_rotation_matrix);
-            rValues.SetDeformationGradientF(F_loc);
+            noalias(aux) = prod(F, inv_rotation_matrix);
+            rValues.SetDeformationGradientF(prod(rotation_matrix, aux));
         }
     }
 }
@@ -1592,11 +1592,9 @@ void BaseSolidElement::RotateToGlobalAxes(
             if (stress_option)
                 rValues.GetStressVector() = prod(trans(voigt_rotation_matrix), rValues.GetStressVector());
             if (constitutive_matrix_option) {
-                const auto& r_C = rValues.GetConstitutiveMatrix();
-                Matrix C_global = r_C;
-                noalias(C_global) = prod(trans(voigt_rotation_matrix), r_C);
-                C_global = prod(C_global, voigt_rotation_matrix);
-                rValues.SetConstitutiveMatrix(C_global);
+                BoundedMatrix<double, 6, 6> aux;
+                noalias(aux) = prod(trans(voigt_rotation_matrix), rValues.GetConstitutiveMatrix());
+                noalias(rValues.GetConstitutiveMatrix()) = prod(aux, voigt_rotation_matrix);
             }
         } else if (strain_size == 3) {
             BoundedMatrix<double, 3, 3> voigt_rotation_matrix;
@@ -1605,23 +1603,26 @@ void BaseSolidElement::RotateToGlobalAxes(
             if (stress_option)
                 rValues.GetStressVector() = prod(trans(voigt_rotation_matrix), rValues.GetStressVector());
             if (constitutive_matrix_option) {
-                const auto& r_C = rValues.GetConstitutiveMatrix();
-                Matrix C_global = r_C;
-                noalias(C_global) = prod(trans(voigt_rotation_matrix), r_C);
-                C_global = prod(C_global, voigt_rotation_matrix);
-                rValues.SetConstitutiveMatrix(C_global);
-            }
+                BoundedMatrix<double, 3, 3> aux;
+                noalias(aux) = prod(trans(voigt_rotation_matrix), rValues.GetConstitutiveMatrix());
+                noalias(rValues.GetConstitutiveMatrix()) = prod(aux, voigt_rotation_matrix);            }
         }
         // Now undo the rotation in F if required
         if (!UseElementProvidedStrain()) {
-            BoundedMatrix<double, 3, 3> inv_rotation_matrix;
-            double aux_det;
-            MathUtils<double>::InvertMatrix3(rotation_matrix, inv_rotation_matrix, aux_det);
-            const auto& r_F = rValues.GetDeformationGradientF();
-            BoundedMatrix<double, 3, 3> F_glob = r_F;
-            noalias(F_glob) = prod(inv_rotation_matrix, r_F);
-            F_glob = prod(F_glob, rotation_matrix);
-            rValues.SetDeformationGradientF(F_glob);
+            // BoundedMatrix<double, 3, 3> inv_rotation_matrix, aux;
+            // double aux_det;
+            // MathUtils<double>::InvertMatrix3(rotation_matrix, inv_rotation_matrix, aux_det);
+            // noalias(aux) = prod(rValues.GetDeformationGradientF(), rotation_matrix);
+            // rValues.SetDeformationGradientF(prod(inv_rotation_matrix, aux));
+
+            // ConstitutiveLaw::DeformationGradientMatrixType inv_rotation_matrix;
+            // ConstitutiveLaw::DeformationGradientMatrixType aux, F;
+            // aux.resize(3, 3, false); F.resize(3, 3, false);
+            // double aux_det;
+            // noalias(F) = rValues.GetDeformationGradientF();
+            // MathUtils<double>::InvertMatrix3(rotation_matrix, inv_rotation_matrix, aux_det);
+            // noalias(aux) = prod(F, rotation_matrix);
+            // rValues.SetDeformationGradientF(prod(inv_rotation_matrix, aux));
         }
     }
 }
