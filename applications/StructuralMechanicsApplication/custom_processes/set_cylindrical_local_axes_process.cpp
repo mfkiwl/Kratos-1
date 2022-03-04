@@ -73,19 +73,15 @@ void SetCylindricalLocalAxesProcess::ExecuteInitializeSolutionStep()
             // Here we update the local axis according to dx = F*dX
             rElement.CalculateOnIntegrationPoints(DEFORMATION_GRADIENT, F, r_process_info);
 
-            auto local_axis_1 = rElement.GetValue(LOCAL_AXIS_1);
-            auto local_axis_2 = rElement.GetValue(LOCAL_AXIS_2);
+            auto& r_local_axis_1 = rElement.GetValue(LOCAL_AXIS_1);
+            r_local_axis_1 = prod(F[0], r_local_axis_1);
+            ConstitutiveLawUtilities<3>::CheckAndNormalizeVector<array_1d<double,3>>(r_local_axis_1);
 
-            local_axis_1 = prod(F[0], local_axis_1);
-            local_axis_2 = prod(F[0], local_axis_2);
-
-            ConstitutiveLawUtilities<3>::CheckAndNormalizeVector<array_1d<double,3>>(local_axis_1);
-            ConstitutiveLawUtilities<3>::CheckAndNormalizeVector<array_1d<double,3>>(local_axis_2);
-
-            rElement.SetValue(LOCAL_AXIS_1, local_axis_1);
-            if (r_process_info[DOMAIN_SIZE] == 3)
-                rElement.SetValue(LOCAL_AXIS_2, local_axis_2);
-
+            if (r_process_info[DOMAIN_SIZE] == 3) {
+                auto& r_local_axis_2 = rElement.GetValue(LOCAL_AXIS_2);
+                r_local_axis_2 = prod(F[0], r_local_axis_2);
+                ConstitutiveLawUtilities<3>::CheckAndNormalizeVector<array_1d<double,3>>(r_local_axis_2);
+            }
         });
     }
 }
