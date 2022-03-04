@@ -55,6 +55,11 @@ public:
     void ExecuteInitializeSolutionStep() override;
 
     /**
+     * @brief This function is designed for being called at the end each time step
+     */
+    void ExecuteFinalizeSolutionStep() override;
+
+    /**
      * @brief This method provides the defaults parameters to avoid conflicts between the different constructors
      */
     const Parameters GetDefaultParameters() const override;

@@ -72,6 +72,37 @@ void SetCartesianLocalAxesProcess::ExecuteInitialize()
 void SetCartesianLocalAxesProcess::ExecuteInitializeSolutionStep()
 {
     if (mThisParameters["update_at_each_step"].GetBool()) {
+        auto &r_process_info = mrThisModelPart.GetProcessInfo();
+        block_for_each(mrThisModelPart.Elements(), [&](Element &rElement) {
+            std::vector <Matrix> F;
+            // Here we update the local axis according to dx = F*dX
+            rElement.CalculateOnIntegrationPoints(DEFORMATION_GRADIENT, F, r_process_info);
+
+            auto local_axis_1 = rElement.GetValue(LOCAL_AXIS_1);
+            auto local_axis_2 = rElement.GetValue(LOCAL_AXIS_2);
+
+            local_axis_1 = prod(F[0], local_axis_1);
+            local_axis_2 = prod(F[0], local_axis_2);
+
+            ConstitutiveLawUtilities<3>::CheckAndNormalizeVector<array_1d<double,3>>(local_axis_1);
+            ConstitutiveLawUtilities<3>::CheckAndNormalizeVector<array_1d<double,3>>(local_axis_2);
+
+            rElement.SetValue(LOCAL_AXIS_1, local_axis_1);
+            if (r_process_info[DOMAIN_SIZE] == 3)
+                rElement.SetValue(LOCAL_AXIS_2, local_axis_2);
+
+        });
+    }
+}
+
+/***********************************************************************************/
+/***********************************************************************************/
+
+void SetCartesianLocalAxesProcess::ExecuteFinalizeSolutionStep()
+{
+    if (mThisParameters["update_at_each_step"].GetBool()) {
+        // we have to reset them to be correctly modified in the
+        // ExecuteInitializeSolutionStep
         ExecuteInitialize();
     }
 }
