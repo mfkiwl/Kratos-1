@@ -166,6 +166,12 @@ class PfemFluidDynamicsAnalysis(AnalysisStage):
         self.end_time   = self.project_parameters["problem_data"]["end_time"].GetDouble()
         self.delta_time = self.project_parameters["solver_settings"]["time_stepping"]["time_step"].GetDouble()
 
+        self.wave_process_wg8  = KratosPfemFluid.CalculateWaveHeightProcess(self.computing_model_part, 1, 0,  60.0,   0.0, 0.3,  "WG_08",   0.05)
+        self.wave_process_wg13 = KratosPfemFluid.CalculateWaveHeightProcess(self.computing_model_part, 1, 0, 165.3,   0.0, 0.3,  "WG_13",   0.05)
+        self.wave_process_wg14 = KratosPfemFluid.CalculateWaveHeightProcess(self.computing_model_part, 1, 0, 170.0,   0.0, 0.3,  "WG_14",   0.05)
+        self.wave_process_wg15 = KratosPfemFluid.CalculateWaveHeightProcess(self.computing_model_part, 1, 0, 223.5,   0.0, 0.1,  "WG_15",   0.05)
+        self.wave_process_us4  = KratosPfemFluid.CalculateWaveHeightProcess(self.computing_model_part, 1, 0, 239.7,   0.0, 0.1,  "US_4",    0.025)
+        self.wave_process_us5  = KratosPfemFluid.CalculateWaveHeightProcess(self.computing_model_part, 1, 0, 241  ,   0.0, 0.1,  "US_5",    0.025)
 
     def InitializeSolutionStep(self):
         """This function performs all the required operations that should be executed
@@ -213,6 +219,13 @@ class PfemFluidDynamicsAnalysis(AnalysisStage):
             process.ExecuteAfterOutputStep()
 
         self.StopTimeMeasuring(self.clock_time,"Finalize Step" , self.report);
+
+        self.wave_process_wg8.Execute()
+        self.wave_process_wg13.Execute()
+        self.wave_process_wg14.Execute()
+        self.wave_process_wg15.Execute()
+        self.wave_process_us4.Execute()
+        self.wave_process_us5.Execute()
 
     def Finalize(self):
         """This function finalizes the AnalysisStage
@@ -355,8 +368,7 @@ class PfemFluidDynamicsAnalysis(AnalysisStage):
             elif (self.constitutive_laws_names[i].GetString()=="Hypoelastic2DLaw" or self.constitutive_laws_names[i].GetString()=="Hypoelastic3DLaw"):
                 self.main_model_part.AddNodalSolutionStepVariable(KratosMultiphysics.POISSON_RATIO)
                 self.main_model_part.AddNodalSolutionStepVariable(KratosMultiphysics.YOUNG_MODULUS)
-            elif (self.constitutive_laws_names[i].GetString()=="Bingham2DLaw" or self.constitutive_laws_names[i].GetString()=="Bingham3DLaw" or
-            self.constitutive_laws_names[i].GetString()=="HerschelBulkley2DLaw" or self.constitutive_laws_names[i].GetString()=="HerschelBulkley3DLaw"):
+            elif (self.constitutive_laws_names[i].GetString()=="Bingham2DLaw" or self.constitutive_laws_names[i].GetString()=="Bingham3DLaw"):
                 self.main_model_part.AddNodalSolutionStepVariable(KratosPfemFluid.FLOW_INDEX)
                 self.main_model_part.AddNodalSolutionStepVariable(KratosPfemFluid.YIELD_SHEAR)
                 self.main_model_part.AddNodalSolutionStepVariable(KratosPfemFluid.YIELDED)
