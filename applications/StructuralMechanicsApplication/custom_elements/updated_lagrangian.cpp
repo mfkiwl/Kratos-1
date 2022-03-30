@@ -85,7 +85,7 @@ void UpdatedLagrangian::Initialize(const ProcessInfo& rCurrentProcessInfo)
 
         for (IndexType point_number = 0; point_number < integration_points.size(); ++point_number) {
             mDetF0[point_number] = 1.0;
-            mF0[point_number] = IdentityMatrix(dimension);
+            noalias(mF0[point_number]) = IdentityMatrix(dimension);
         }
 
         mF0Computed = false;
@@ -230,7 +230,7 @@ void UpdatedLagrangian::CalculateAll(
         if ( rRightHandSideVector.size() != mat_size )
             rRightHandSideVector.resize( mat_size, false );
 
-        rRightHandSideVector = ZeroVector( mat_size ); //resetting RHS
+        noalias(rRightHandSideVector) = ZeroVector( mat_size ); //resetting RHS
     }
 
     // Reading integration points
