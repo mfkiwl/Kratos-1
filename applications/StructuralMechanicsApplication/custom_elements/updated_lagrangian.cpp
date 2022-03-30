@@ -85,6 +85,7 @@ void UpdatedLagrangian::Initialize(const ProcessInfo& rCurrentProcessInfo)
 
         for (IndexType point_number = 0; point_number < integration_points.size(); ++point_number) {
             mDetF0[point_number] = 1.0;
+            mF0[point_number].resize(dimension, dimension, false);
             noalias(mF0[point_number]) = IdentityMatrix(dimension);
         }
 
