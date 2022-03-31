@@ -163,8 +163,10 @@ void TotalLagrangian::CalculateAll(
 {
     KRATOS_TRY;
 
-    const SizeType number_of_nodes = this->GetGeometry().size();
-    const SizeType dimension = this->GetGeometry().WorkingSpaceDimension();
+    const auto &r_geometry = GetGeometry();
+    const auto &r_properties = GetProperties();
+    const SizeType number_of_nodes = r_geometry.size();
+    const SizeType dimension = r_geometry.WorkingSpaceDimension();
     const auto strain_size = GetStrainSize();
 
     KinematicVariables this_kinematic_variables(strain_size, dimension, number_of_nodes);
@@ -189,9 +191,9 @@ void TotalLagrangian::CalculateAll(
     }
 
     // Reading integration points
-    const GeometryType::IntegrationPointsArrayType& integration_points = GetGeometry().IntegrationPoints(this->GetIntegrationMethod());
+    const GeometryType::IntegrationPointsArrayType& integration_points = r_geometry.IntegrationPoints(this->GetIntegrationMethod());
 
-    ConstitutiveLaw::Parameters Values(GetGeometry(),GetProperties(),rCurrentProcessInfo);
+    ConstitutiveLaw::Parameters Values(r_geometry, r_properties, rCurrentProcessInfo);
 
     // Set constitutive law flags:
     Flags& ConstitutiveLawOptions=Values.GetOptions();
@@ -224,8 +226,8 @@ void TotalLagrangian::CalculateAll(
         // Calculating weights for integration on the reference configuration
         int_to_reference_weight = GetIntegrationWeight(integration_points, point_number, this_kinematic_variables.detJ0);
 
-        if ( dimension == 2 && this->GetProperties().Has( THICKNESS ))
-            int_to_reference_weight *= this->GetProperties()[THICKNESS];
+        if ( dimension == 2 && r_properties.Has( THICKNESS ))
+            int_to_reference_weight *= r_properties[THICKNESS];
 
         if ( CalculateStiffnessMatrixFlag ) { // Calculation of the matrix is required
             // Contributions to stiffness matrix calculated on the reference config
