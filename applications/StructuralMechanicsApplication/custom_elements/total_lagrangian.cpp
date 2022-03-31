@@ -185,7 +185,7 @@ void TotalLagrangian::CalculateAll(
         if ( rRightHandSideVector.size() != mat_size )
             rRightHandSideVector.resize( mat_size, false );
 
-        rRightHandSideVector = ZeroVector( mat_size ); //resetting RHS
+        noalias(rRightHandSideVector) = ZeroVector( mat_size ); //resetting RHS
     }
 
     // Reading integration points
@@ -227,7 +227,7 @@ void TotalLagrangian::CalculateAll(
         if ( dimension == 2 && this->GetProperties().Has( THICKNESS ))
             int_to_reference_weight *= this->GetProperties()[THICKNESS];
 
-        if ( CalculateStiffnessMatrixFlag == true ) { // Calculation of the matrix is required
+        if ( CalculateStiffnessMatrixFlag ) { // Calculation of the matrix is required
             // Contributions to stiffness matrix calculated on the reference config
             /* Material stiffness matrix */
             this->CalculateAndAddKm( rLeftHandSideMatrix, this_kinematic_variables.B, this_constitutive_variables.D, int_to_reference_weight );
@@ -236,7 +236,7 @@ void TotalLagrangian::CalculateAll(
             this->CalculateAndAddKg( rLeftHandSideMatrix, this_kinematic_variables.DN_DX, this_constitutive_variables.StressVector, int_to_reference_weight );
         }
 
-        if ( CalculateResidualVectorFlag == true ) { // Calculation of the matrix is required
+        if ( CalculateResidualVectorFlag ) { // Calculation of the matrix is required
             this->CalculateAndAddResidualVector(rRightHandSideVector, this_kinematic_variables, rCurrentProcessInfo, body_force, this_constitutive_variables.StressVector, int_to_reference_weight);
         }
     }
@@ -253,26 +253,21 @@ void TotalLagrangian::CalculateKinematicVariables(
     const GeometryType::IntegrationMethod& rIntegrationMethod
     )
 {
+    const auto &r_geometry = GetGeometry();
     // Shape functions
-    rThisKinematicVariables.N = row(GetGeometry().ShapeFunctionsValues(rIntegrationMethod), PointNumber);
+    noalias(rThisKinematicVariables.N) = row(r_geometry.ShapeFunctionsValues(rIntegrationMethod), PointNumber);
 
     rThisKinematicVariables.detJ0 = this->CalculateDerivativesOnReferenceConfiguration(rThisKinematicVariables.J0, rThisKinematicVariables.InvJ0, rThisKinematicVariables.DN_DX, PointNumber, rIntegrationMethod);
     KRATOS_ERROR_IF(rThisKinematicVariables.detJ0 < 0.0) << "WARNING:: ELEMENT ID: " << this->Id() << " INVERTED. DETJ0: " << rThisKinematicVariables.detJ0 << std::endl;
 
     Matrix J;
-    J = this->GetGeometry().Jacobian(J, PointNumber, rIntegrationMethod);
+    r_geometry.Jacobian(J, PointNumber, rIntegrationMethod);
     if (IsAxissymmetric()) {
-        CalculateAxisymmetricF(J, rThisKinematicVariables.InvJ0,
-                               rThisKinematicVariables.N,
-                               rThisKinematicVariables.F);
-        CalculateAxisymmetricB(
-            rThisKinematicVariables.B, rThisKinematicVariables.F,
-            rThisKinematicVariables.DN_DX, rThisKinematicVariables.N);
+        CalculateAxisymmetricF(J, rThisKinematicVariables.InvJ0, rThisKinematicVariables.N, rThisKinematicVariables.F);
+        CalculateAxisymmetricB(rThisKinematicVariables.B, rThisKinematicVariables.F, rThisKinematicVariables.DN_DX, rThisKinematicVariables.N);
     } else {
-        GeometryUtils::DeformationGradient(J, rThisKinematicVariables.InvJ0,
-                                           rThisKinematicVariables.F);
-        CalculateB(rThisKinematicVariables.B, rThisKinematicVariables.F,
-                   rThisKinematicVariables.DN_DX);
+        GeometryUtils::DeformationGradient(J, rThisKinematicVariables.InvJ0, rThisKinematicVariables.F);
+        CalculateB(rThisKinematicVariables.B, rThisKinematicVariables.F, rThisKinematicVariables.DN_DX);
     }
 
     rThisKinematicVariables.detF = MathUtils<double>::Det(rThisKinematicVariables.F);
