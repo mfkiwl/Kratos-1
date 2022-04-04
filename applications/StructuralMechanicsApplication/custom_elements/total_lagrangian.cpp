@@ -190,6 +190,12 @@ void TotalLagrangian::CalculateAll(
         noalias(rRightHandSideVector) = ZeroVector( mat_size ); //resetting RHS
     }
 
+    // declare u-p matrices
+    double Kpp = 0.0;
+    double f_int_p = 0.0;
+    Vector Kup(mat_size);
+    noalias(Kup) = ZeroVector(mat_size);
+
     // Reading integration points
     const GeometryType::IntegrationPointsArrayType& integration_points = r_geometry.IntegrationPoints(this->GetIntegrationMethod());
 
@@ -212,6 +218,49 @@ void TotalLagrangian::CalculateAll(
     array_1d<double, 3> body_force;
     double int_to_reference_weight;
 
+    const double E = r_properties[YOUNG_MODULUS];
+    const double nu = r_properties[POISSON_RATIO];
+    const double bulk_modulus = E / (3.0 * (1.0 - 2.0 * nu));
+
+//---------------------------------------------------------
+//---------------------------- just to compute P -----------------------------
+    // for ( IndexType point_number = 0; point_number < integration_points.size(); ++point_number ) {
+    //     // Contribution to external forces
+    //     noalias(body_force) = this->GetBodyForce(integration_points, point_number);
+
+    //     // Compute element kinematics B, F, DN_DX ...
+    //     this->CalculateKinematicVariables(this_kinematic_variables, point_number, this->GetIntegrationMethod());
+
+    //     // Compute material reponse
+    //     this->CalculateConstitutiveVariables(this_kinematic_variables, this_constitutive_variables, Values, point_number, integration_points, this->GetStressMeasure());
+
+    //     // Calculating weights for integration on the reference configuration
+    //     int_to_reference_weight = GetIntegrationWeight(integration_points, point_number, this_kinematic_variables.detJ0);
+
+    //     if ( dimension == 2 && r_properties.Has( THICKNESS ))
+    //         int_to_reference_weight *= r_properties[THICKNESS];
+
+
+    //     // we accumulate u-p entities...
+    //     const Matrix C = prod(trans(this_kinematic_variables.F), this_kinematic_variables.F);
+    //     Matrix inv_C;
+    //     double det;
+    //     MathUtils<double>::InvertMatrix3(C, inv_C, det);
+    //     Vector inv_c_voigt = MathUtils<double>::StrainTensorToVector(inv_C, GetStrainSize());
+    //     inv_c_voigt[3] /= 2.0;
+    //     inv_c_voigt[4] /= 2.0;
+    //     inv_c_voigt[5] /= 2.0;
+    //     noalias(Kup) -= int_to_reference_weight*this_kinematic_variables.detF*prod(trans(this_kinematic_variables.B), inv_c_voigt);
+    //     Kpp -= int_to_reference_weight / bulk_modulus;
+    //     // f_int_p -= int_to_reference_weight * (this_kinematic_variables.detJ0 - 1.0 + mPressure / bulk_modulus);
+    // } // end IP loop
+    // Vector displ, displ_old;
+    // GetValuesVector(displ, 0);
+    // GetValuesVector(displ_old, 1);
+    // mPressure -= (mFp + inner_prod(Kup, displ - displ_old)) / Kpp;
+//---------------------------------------------------------
+//---------------------------------------------------------
+
     // Computing in all integrations points
     for ( IndexType point_number = 0; point_number < integration_points.size(); ++point_number ) {
         // Contribution to external forces
@@ -229,6 +278,20 @@ void TotalLagrangian::CalculateAll(
         if ( dimension == 2 && r_properties.Has( THICKNESS ))
             int_to_reference_weight *= r_properties[THICKNESS];
 
+
+        // we accumulate u-p entities...
+        const Matrix C = prod(trans(this_kinematic_variables.F), this_kinematic_variables.F);
+        Matrix inv_C;
+        double det;
+        MathUtils<double>::InvertMatrix3(C, inv_C, det);
+        Vector inv_c_voigt = MathUtils<double>::StrainTensorToVector(inv_C, GetStrainSize());
+        inv_c_voigt[3] /= 2.0;
+        inv_c_voigt[4] /= 2.0;
+        inv_c_voigt[5] /= 2.0;
+        noalias(Kup) -= int_to_reference_weight*this_kinematic_variables.detF*prod(trans(this_kinematic_variables.B), inv_c_voigt);
+        Kpp          -= int_to_reference_weight / bulk_modulus;
+        f_int_p      -= int_to_reference_weight * (this_kinematic_variables.detF - 1.0 + mPressure / bulk_modulus);
+
         if ( CalculateStiffnessMatrixFlag ) { // Calculation of the matrix is required
             // Contributions to stiffness matrix calculated on the reference config
             /* Material stiffness matrix */
@@ -241,7 +304,35 @@ void TotalLagrangian::CalculateAll(
         if ( CalculateResidualVectorFlag ) { // Calculation of the matrix is required
             this->CalculateAndAddResidualVector(rRightHandSideVector, this_kinematic_variables, rCurrentProcessInfo, body_force, this_constitutive_variables.StressVector, int_to_reference_weight);
         }
-    }
+    } // end IP loop
+
+    // here we add u-p terms to the LHS and RHS
+    // if (rCurrentProcessInfo[NL_ITERATION_NUMBER] > 1) {
+        if (CalculateStiffnessMatrixFlag)
+            noalias(rLeftHandSideMatrix) -= outer_prod(Kup, Kup) / Kpp;
+        if (CalculateResidualVectorFlag)
+            noalias(rRightHandSideVector) += Kup * f_int_p / Kpp;
+    // }
+
+
+
+    // now we condensate the elemental pressure
+    Vector displ, displ_old;
+    GetValuesVector(displ, 0);
+    GetValuesVector(displ_old, 1);
+
+    // const double dP = (f_int_p + inner_prod(Kup, displ - displ_old)) / Kpp;
+    // KRATOS_WATCH(d)
+    // if (CalculateResidualVectorFlag)
+        mPressure -= (f_int_p + inner_prod(Kup, displ - displ_old)) / Kpp;
+
+    // if (this->Id() == 25) {
+        // KRATOS_WATCH(mPressure)
+        // KRATOS_WATCH(dP)
+        // KRATOS_WATCH(Kup)
+        // KRATOS_WATCH(Kpp)
+    // }
+
 
     KRATOS_CATCH( "" )
 }

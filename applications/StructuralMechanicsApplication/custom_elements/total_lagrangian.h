@@ -248,7 +248,8 @@ private:
     ///@}
     ///@name Member Variables
     ///@{
-
+    double mPressure = 0.0;
+    double mFp = 0.0;
     ///@}
     ///@name Private Operators
     ///@{
