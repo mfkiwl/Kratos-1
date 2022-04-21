@@ -34,14 +34,13 @@
 
 namespace Kratos
 {
-  //Create Variables
+  // Create Variables
 
-
-  KratosDelaunayMeshingApplication::KratosDelaunayMeshingApplication    ():
-    KratosApplication("DelaunayMeshingApplication"),
-    mCompositeCondition2D2N( 0, Kratos::make_shared<Line2D2<Node<3> > >( Condition::GeometryType::PointsArrayType( 2 ) ) ) ,
-    mCompositeCondition3D3N( 0, Kratos::make_shared<Triangle3D3<Node<3> > >( Condition::GeometryType::PointsArrayType( 3 ) ) )
-  {}
+  KratosDelaunayMeshingApplication::KratosDelaunayMeshingApplication() : KratosApplication("DelaunayMeshingApplication"),
+                                                                         mCompositeCondition2D2N(0, Kratos::make_shared<Line2D2<Node<3>>>(Condition::GeometryType::PointsArrayType(2))),
+                                                                         mCompositeCondition3D3N(0, Kratos::make_shared<Triangle3D3<Node<3>>>(Condition::GeometryType::PointsArrayType(3)))
+  {
+  }
 
   void KratosDelaunayMeshingApplication::Register()
   {
@@ -63,56 +62,55 @@ namespace Kratos
 
     if (mpi_is_initialized)
     {
-      MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     }
 
 #endif
 
     if (mpi_is_initialized)
     {
-      if (rank == 0) KRATOS_INFO("") << banner.str();
+      if (rank == 0)
+        KRATOS_INFO("") << banner.str();
     }
     else
     {
       KRATOS_INFO("") << banner.str();
     }
 
-    //Register Variables (variables created in delaunay_meshing_application_variables.cpp)
+    // Register Variables (variables created in delaunay_meshing_application_variables.cpp)
 
+    // geometrical definition
+    KRATOS_REGISTER_3D_VARIABLE_WITH_COMPONENTS(OFFSET)
+    KRATOS_REGISTER_VARIABLE(SHRINK_FACTOR)
 
-    //geometrical definition
-    KRATOS_REGISTER_3D_VARIABLE_WITH_COMPONENTS( OFFSET )
-    KRATOS_REGISTER_VARIABLE( SHRINK_FACTOR )
+    // domain definition
+    KRATOS_REGISTER_VARIABLE(INITIALIZED_DOMAINS)
+    KRATOS_REGISTER_VARIABLE(MESHING_STEP_TIME)
+    KRATOS_REGISTER_VARIABLE(MODEL_PART_NAME)
+    KRATOS_REGISTER_VARIABLE(MODEL_PART_NAMES)
 
-    //domain definition
-    KRATOS_REGISTER_VARIABLE( INITIALIZED_DOMAINS )
-    KRATOS_REGISTER_VARIABLE( MESHING_STEP_TIME )
-    KRATOS_REGISTER_VARIABLE( MODEL_PART_NAME )
-    KRATOS_REGISTER_VARIABLE( MODEL_PART_NAMES )
+    // boundary definition
+    KRATOS_REGISTER_VARIABLE(RIGID_WALL)
+    KRATOS_REGISTER_VARIABLE(PROPERTY_ID)
+    KRATOS_REGISTER_VARIABLE(SECOND_PROPERTY_ID)
 
-    //boundary definition
-    KRATOS_REGISTER_VARIABLE( RIGID_WALL )
-    KRATOS_REGISTER_VARIABLE( PROPERTY_ID )
-    KRATOS_REGISTER_VARIABLE( SECOND_PROPERTY_ID )
+    KRATOS_REGISTER_VARIABLE(MASTER_NODE)
+    KRATOS_REGISTER_VARIABLE(MASTER_ELEMENT)
+    KRATOS_REGISTER_VARIABLE(MASTER_CONDITION)
 
+    KRATOS_REGISTER_VARIABLE(MASTER_NODES)
+    KRATOS_REGISTER_VARIABLE(MASTER_ELEMENTS)
+    KRATOS_REGISTER_VARIABLE(MASTER_CONDITIONS)
 
-    KRATOS_REGISTER_VARIABLE( MASTER_NODE )
-    KRATOS_REGISTER_VARIABLE( MASTER_ELEMENT )
-    KRATOS_REGISTER_VARIABLE( MASTER_CONDITION )
+    // condition variables
+    KRATOS_REGISTER_VARIABLE(CHILDREN_CONDITIONS)
 
-    KRATOS_REGISTER_VARIABLE( MASTER_NODES )
-    KRATOS_REGISTER_VARIABLE( MASTER_ELEMENTS )
-    KRATOS_REGISTER_VARIABLE( MASTER_CONDITIONS )
+    // mesher criteria
+    KRATOS_REGISTER_VARIABLE(MEAN_ERROR)
 
-    //condition variables
-    KRATOS_REGISTER_VARIABLE( CHILDREN_CONDITIONS )
-
-    //mesher criteria
-    KRATOS_REGISTER_VARIABLE( MEAN_ERROR )
-
-    //Register Conditions
-    KRATOS_REGISTER_CONDITION( "CompositeCondition2D2N", mCompositeCondition2D2N )
-    KRATOS_REGISTER_CONDITION( "CompositeCondition3D3N", mCompositeCondition3D3N )
+    // Register Conditions
+    KRATOS_REGISTER_CONDITION("CompositeCondition2D2N", mCompositeCondition2D2N)
+    KRATOS_REGISTER_CONDITION("CompositeCondition3D3N", mCompositeCondition3D3N)
   }
 
-}  // namespace Kratos.
+} // namespace Kratos.

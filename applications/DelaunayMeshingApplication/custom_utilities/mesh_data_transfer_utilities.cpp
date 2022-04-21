@@ -1265,9 +1265,9 @@ namespace Kratos
         typedef Geometry<NodeType> GeometryType;
         GeometryType &r_geometry = new_element->GetGeometry();
         unsigned int property_id = 0;
-        
+
         // unsigned int interfaceProperty = 100;
-        //bool interfaceElement = false;
+        // bool interfaceElement = false;
         // std::vector<int> array_of_properties;
         // for (unsigned int i = 0; i < list_of_new_vertices[i_center->Id() - 1].size(); i++)
         // {

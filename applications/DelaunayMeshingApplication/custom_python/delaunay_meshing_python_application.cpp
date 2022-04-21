@@ -23,40 +23,38 @@
 namespace Kratos
 {
 
-namespace Python
-{
+  namespace Python
+  {
 
-namespace py = pybind11;
+    namespace py = pybind11;
 
-PYBIND11_MODULE(KratosDelaunayMeshingApplication,m)
-{
+    PYBIND11_MODULE(KratosDelaunayMeshingApplication, m)
+    {
 
-  py::class_<KratosDelaunayMeshingApplication,
-         KratosDelaunayMeshingApplication::Pointer,
-         KratosApplication>(m,"KratosDelaunayMeshingApplication")
-      .def(py::init<>())
-      ;
+      py::class_<KratosDelaunayMeshingApplication,
+                 KratosDelaunayMeshingApplication::Pointer,
+                 KratosApplication>(m, "KratosDelaunayMeshingApplication")
+          .def(py::init<>());
 
-  AddCustomProcessesToPython(m);
-  AddCustomUtilitiesToPython(m);
-  AddCustomMeshersToPython(m);
-  AddCustomBoundingToPython(m);
+      AddCustomProcessesToPython(m);
+      AddCustomUtilitiesToPython(m);
+      AddCustomMeshersToPython(m);
+      AddCustomBoundingToPython(m);
 
-  //registering variables in python ( if must to be seen from python )
+      // registering variables in python ( if must to be seen from python )
 
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, INITIALIZED_DOMAINS )
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, MESHING_STEP_TIME )
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, RIGID_WALL )
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, PROPERTY_ID )
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, SECOND_PROPERTY_ID )
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, MEAN_ERROR )
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, OFFSET )
-  KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, SHRINK_FACTOR )
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, INITIALIZED_DOMAINS)
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, MESHING_STEP_TIME)
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, RIGID_WALL)
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, PROPERTY_ID)
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, SECOND_PROPERTY_ID)
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, MEAN_ERROR)
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, OFFSET)
+      KRATOS_REGISTER_IN_PYTHON_VARIABLE(m, SHRINK_FACTOR)
+    }
 
-}
+  } // namespace Python.
 
-}  // namespace Python.
-
-}  // namespace Kratos.
+} // namespace Kratos.
 
 #endif // KRATOS_PYTHON defined
