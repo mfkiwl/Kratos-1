@@ -40,6 +40,7 @@ namespace Kratos
   //boundary definition
   KRATOS_CREATE_VARIABLE(int,                                 RIGID_WALL )
   KRATOS_CREATE_VARIABLE( int, PROPERTY_ID )
+  KRATOS_CREATE_VARIABLE( int, SECOND_PROPERTY_ID )
 
   //custom neighbor and masters
   KRATOS_CREATE_VARIABLE(GlobalPointer<Node<3>>,                    MASTER_NODE )
