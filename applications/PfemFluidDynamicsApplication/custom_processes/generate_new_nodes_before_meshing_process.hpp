@@ -2187,6 +2187,7 @@ namespace Kratos
 
 			KRATOS_TRY
 			MasterNode->FastGetSolutionStepValue(PROPERTY_ID) = SlaveNode->FastGetSolutionStepValue(PROPERTY_ID);
+			MasterNode->FastGetSolutionStepValue(SECOND_PROPERTY_ID) = SlaveNode->FastGetSolutionStepValue(SECOND_PROPERTY_ID);
 			if (MasterNode->SolutionStepsDataHas(BULK_MODULUS) && SlaveNode->SolutionStepsDataHas(BULK_MODULUS))
 				MasterNode->FastGetSolutionStepValue(BULK_MODULUS) = SlaveNode->FastGetSolutionStepValue(BULK_MODULUS);
 			if (MasterNode->SolutionStepsDataHas(DENSITY) && SlaveNode->SolutionStepsDataHas(DENSITY))
