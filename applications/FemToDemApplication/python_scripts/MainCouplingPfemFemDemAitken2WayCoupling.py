@@ -4,6 +4,7 @@ import KratosMultiphysics.FemToDemApplication as FEMDEM
 import KratosMultiphysics.PfemFluidDynamicsApplication as PFEM
 import KratosMultiphysics.FemToDemApplication.MainCoupling2WayFemDem_for_PFEM_coupling as MainCoupling2WayFemDem_for_PFEM_coupling
 import KratosMultiphysics.FemToDemApplication.MainPFEM_for_coupling as MainPFEM_for_coupling
+import KratosMultiphysics.FemToDemApplication.MainCouplingPfemFemDemAitken as MainCouplingPfemFemDemAitken
 import math as math
 
 def Wait():
