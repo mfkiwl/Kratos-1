@@ -163,6 +163,8 @@ namespace Kratos
 			mrRemesh.Info->RemovedNodes += error_nodes_removed + inside_nodes_removed + boundary_nodes_removed;
 			int distance_remove = inside_nodes_removed + boundary_nodes_removed;
 
+			KRATOS_WATCH(mrRemesh.Info->BalanceSecondaryPartsNodes)
+
 			if (mEchoLevel > 1)
 			{
 				std::cout << "   [ NODES      ( removed : " << mrRemesh.Info->RemovedNodes << " ) ]" << std::endl;
@@ -543,8 +545,8 @@ namespace Kratos
 						if (dimension == 3)
 							radius = 0.48 * initialMeanRadius; // 20% less then normal nodes
 
-						// if ((propertyIdNode == principalModelPartId && mrRemesh.Info->BalancePrincipalSecondaryPartsNodes > 0) ||
-						// 	(propertyIdNode != principalModelPartId && mrRemesh.Info->BalancePrincipalSecondaryPartsNodes < 0))
+						// if ((propertyIdNode == principalModelPartId && mrRemesh.Info->BalanceSecondaryPartsNodes > 0) ||
+						// 	(propertyIdNode != principalModelPartId && mrRemesh.Info->BalanceSecondaryPartsNodes < 0))
 						// {
 						// 	radius *= 0.95;
 						// }
@@ -631,11 +633,11 @@ namespace Kratos
 
 										if (propertyIdNode == principalModelPartId)
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 										}
 										else
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 										}
 										// distance_remove++;
 									}
@@ -687,11 +689,11 @@ namespace Kratos
 
 								if (propertyIdNode == principalModelPartId)
 								{
-									mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+									mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 								}
 								else
 								{
-									mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+									mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 								}
 
 								// distance_remove ++;
@@ -706,11 +708,11 @@ namespace Kratos
 
 								if (propertyIdNode == principalModelPartId)
 								{
-									mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+									mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 								}
 								else
 								{
-									mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+									mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 								}
 							}
 						}
@@ -778,7 +780,6 @@ namespace Kratos
 				std::cout << "boundary_nodes_removed " << boundary_nodes_removed << std::endl;
 				std::cout << "inside_nodes_removed " << inside_nodes_removed << std::endl;
 			}
-			KRATOS_WATCH(mrRemesh.Info->BalancePrincipalSecondaryPartsNodes)
 			return any_node_removed;
 
 			KRATOS_CATCH(" ")
@@ -868,11 +869,11 @@ namespace Kratos
 						unsigned int propertyIdNode = eElement[i].FastGetSolutionStepValue(PROPERTY_ID);
 						if (propertyIdNode == principalModelPartId)
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 						}
 						else
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 						}
 					}
 				}
@@ -899,11 +900,11 @@ namespace Kratos
 							unsigned int propertyIdNode = eElement[i].FastGetSolutionStepValue(PROPERTY_ID);
 							if (propertyIdNode == principalModelPartId)
 							{
-								mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+								mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 							}
 							else
 							{
-								mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+								mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 							}
 						}
 						else
@@ -926,11 +927,11 @@ namespace Kratos
 										unsigned int propertyIdNode = eElement[i].FastGetSolutionStepValue(PROPERTY_ID);
 										if (propertyIdNode == principalModelPartId)
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 										}
 										else
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 										}
 									}
 								}
@@ -1226,11 +1227,11 @@ namespace Kratos
 						unsigned int propertyIdNode = eElement[i].FastGetSolutionStepValue(PROPERTY_ID);
 						if (propertyIdNode == principalModelPartId)
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 						}
 						else
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 						}
 					}
 				}
@@ -1289,11 +1290,11 @@ namespace Kratos
 					unsigned int propertyIdNode = eElement[notRigidNodeId].FastGetSolutionStepValue(PROPERTY_ID);
 					if (propertyIdNode == principalModelPartId)
 					{
-						mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+						mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 					}
 					else
 					{
-						mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+						mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 					}
 				}
 			}
@@ -1319,11 +1320,11 @@ namespace Kratos
 							unsigned int propertyIdNode = eElement[i].FastGetSolutionStepValue(PROPERTY_ID);
 							if (propertyIdNode == principalModelPartId)
 							{
-								mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+								mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 							}
 							else
 							{
-								mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+								mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 							}
 						}
 						else
@@ -1351,11 +1352,11 @@ namespace Kratos
 										unsigned int propertyIdNode = eElement[i].FastGetSolutionStepValue(PROPERTY_ID);
 										if (propertyIdNode == principalModelPartId)
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 										}
 										else
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 										}
 									}
 								}
@@ -1378,11 +1379,11 @@ namespace Kratos
 										unsigned int propertyIdNode = eElement[i].FastGetSolutionStepValue(PROPERTY_ID);
 										if (propertyIdNode == principalModelPartId)
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 										}
 										else
 										{
-											mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+											mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 										}
 									}
 								}
@@ -1542,11 +1543,11 @@ namespace Kratos
 						unsigned int propertyIdNode = eElement[FirstEdgeNode[i]].FastGetSolutionStepValue(PROPERTY_ID);
 						if (propertyIdNode == principalModelPartId)
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 						}
 						else
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 						}
 					}
 					else if (eElement[SecondEdgeNode[i]].IsNot(RIGID) && eElement[SecondEdgeNode[i]].IsNot(SOLID) && eElement[SecondEdgeNode[i]].IsNot(TO_ERASE) && eElement[SecondEdgeNode[i]].IsNot(ISOLATED))
@@ -1558,11 +1559,11 @@ namespace Kratos
 						unsigned int propertyIdNode = eElement[SecondEdgeNode[i]].FastGetSolutionStepValue(PROPERTY_ID);
 						if (propertyIdNode == principalModelPartId)
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 						}
 						else
 						{
-							mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+							mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 						}
 					}
 				}

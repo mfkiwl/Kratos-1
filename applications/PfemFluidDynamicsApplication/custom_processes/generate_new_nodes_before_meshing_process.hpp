@@ -117,7 +117,7 @@ namespace Kratos
 			if (currentTime < 2 * timeInterval)
 			{
 				mrRemesh.Info->RemovedNodes = 0;
-				mrRemesh.Info->BalancePrincipalSecondaryPartsNodes = 0;
+				mrRemesh.Info->BalanceSecondaryPartsNodes = 0;
 
 				if (mEchoLevel > 1)
 					std::cout << " First meshes: I repare the mesh without adding new nodes" << std::endl;
@@ -2052,8 +2052,8 @@ namespace Kratos
 				{
 
 					unsigned int propertyIdNodeSlave1 = SlaveNode1->FastGetSolutionStepValue(PROPERTY_ID);
-					if ((mrRemesh.Info->BalancePrincipalSecondaryPartsNodes < 0 && propertyIdNodeSlave1 == principalModelPartId) ||
-						(mrRemesh.Info->BalancePrincipalSecondaryPartsNodes > 0 && propertyIdNodeSlave1 != principalModelPartId) ||
+					if ((mrRemesh.Info->BalanceSecondaryPartsNodes < 0 && propertyIdNodeSlave1 == principalModelPartId) ||
+						(mrRemesh.Info->BalanceSecondaryPartsNodes > 0 && propertyIdNodeSlave1 != principalModelPartId) ||
 						(SlaveNode2->Is(RIGID) || SlaveNode2->Is(SOLID)))
 					{
 						TakeMaterialPropertiesFromNotRigidNode(pnode, SlaveNode1);
@@ -2067,11 +2067,11 @@ namespace Kratos
 				unsigned int propertyIdNode = pnode->FastGetSolutionStepValue(PROPERTY_ID);
 				if (propertyIdNode == principalModelPartId)
 				{
-					mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += 1;
+					mrRemesh.Info->BalanceSecondaryPartsNodes += 1;
 				}
 				else
 				{
-					mrRemesh.Info->BalancePrincipalSecondaryPartsNodes += -1;
+					mrRemesh.Info->BalanceSecondaryPartsNodes += -1;
 				}
 			}
 
@@ -2091,7 +2091,7 @@ namespace Kratos
 				mrModelPart.Nodes().push_back(*(it));
 			}
 
-			KRATOS_WATCH(mrRemesh.Info->BalancePrincipalSecondaryPartsNodes)
+			KRATOS_WATCH(mrRemesh.Info->BalanceSecondaryPartsNodes)
 
 			KRATOS_CATCH("")
 		}
