@@ -7,49 +7,44 @@
 //  License:         BSD License
 //                   Kratos default license: kratos/license.txt
 //
-//  Main authors:    Javier San Mauro Saiz
-//                   Joaquin Irazabal Gonzalez
+//  Main authors:    Ignasi de Pouplana
 //
 
-#if !defined (KRATOS_JOINT_COHESION_DRIVEN_2D_LAW_H_INCLUDED)
-#define  KRATOS_JOINT_COHESION_DRIVEN_2D_LAW_H_INCLUDED
-
-// Project includes
-#include "includes/serializer.h"
+#if !defined (KRATOS_JOINT_BILINEAR_COHESIVE_2D_LAW_H_INCLUDED)
+#define  KRATOS_JOINT_BILINEAR_COHESIVE_2D_LAW_H_INCLUDED
 
 // Application includes
-#include "custom_constitutive/joint_cohesion_driven_3D_law.hpp"
-#include "dam_application_variables.h"
+#include "custom_constitutive/joint_bilinear_cohesive_3D_law.hpp"
 
 namespace Kratos
 {
 
-class KRATOS_API(DAM_APPLICATION) JointCohesionDriven2DLaw : public JointCohesionDriven3DLaw
+class KRATOS_API(DAM_APPLICATION) JointBilinearCohesive2DLaw : public JointBilinearCohesive3DLaw
 {
 
 public:
 
-    KRATOS_CLASS_POINTER_DEFINITION(JointCohesionDriven2DLaw);
+    KRATOS_CLASS_POINTER_DEFINITION(JointBilinearCohesive2DLaw);
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     // Default Constructor
-    JointCohesionDriven2DLaw()
+    JointBilinearCohesive2DLaw()
     {
     }
 
     ConstitutiveLaw::Pointer Clone() const override
     {
-        return Kratos::make_shared<JointCohesionDriven2DLaw>(JointCohesionDriven2DLaw(*this));
+        return Kratos::make_shared<JointBilinearCohesive2DLaw>(JointBilinearCohesive2DLaw(*this));
     }
 
     // Copy Constructor
-    JointCohesionDriven2DLaw (const JointCohesionDriven2DLaw& rOther) : JointCohesionDriven3DLaw(rOther)
+    JointBilinearCohesive2DLaw (const JointBilinearCohesive2DLaw& rOther) : JointBilinearCohesive3DLaw(rOther)
     {
     }
 
     // Destructor
-    ~JointCohesionDriven2DLaw() override
+    ~JointBilinearCohesive2DLaw() override
     {
     }
 
@@ -68,12 +63,12 @@ protected:
     void ComputeEquivalentStrain(ConstitutiveLawVariables& rVariables, Parameters& rValues) override;
 
     void ComputeConstitutiveMatrix(Matrix& rConstitutiveMatrix,
-                                   ConstitutiveLawVariables& rVariables,
-                                   Parameters& rValues) override;
+                                    ConstitutiveLawVariables& rVariables,
+                                    Parameters& rValues) override;
 
     void ComputeStressVector(Vector& rStressVector,
-                             ConstitutiveLawVariables& rVariables,
-                             Parameters& rValues) override;
+                                ConstitutiveLawVariables& rVariables,
+                                Parameters& rValues) override;
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -93,6 +88,6 @@ private:
         KRATOS_SERIALIZE_LOAD_BASE_CLASS( rSerializer, ConstitutiveLaw )
     }
 
-}; // Class JointCohesionDriven2DLaw
+}; // Class JointBilinearCohesive2DLaw
 }  // namespace Kratos.
-#endif // KRATOS_JOINT_COHESION_DRIVEN_2D_LAW_H_INCLUDED  defined
+#endif // KRATOS_JOINT_BILINEAR_COHESIVE_2D_LAW_H_INCLUDED  defined
